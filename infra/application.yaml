@@ -1,0 +1,21 @@
+# argocd-apps chart values
+applications:
+  house-split:
+    namespace: argocd
+    project: default
+    source:
+      repoURL: https://github.com/tomasmbrito/house-split.git
+      # CI updates the image tag on this branch
+      targetRevision: deploy
+      path: k8s
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: house-split
+    syncPolicy:
+      automated:
+        # remove resources deleted from git
+        prune: true
+        # revert manual kubectl changes
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true

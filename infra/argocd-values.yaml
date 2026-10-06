@@ -1,0 +1,14 @@
+# argo-cd chart values, trimmed down since it runs on a laptop
+
+# no SSO, we just use the admin user
+dex:
+  enabled: false
+
+# not using notifications
+notifications:
+  enabled: false
+
+configs:
+  cm:
+    # check git every 60s instead of the default ~3 min
+    timeout.reconciliation: 60s
