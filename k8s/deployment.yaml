@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: house-split
+  labels:
+    app: house-split
+spec:
+  # SQLite is a single file, so only one pod can use it at a time.
+  # Recreate stops the old pod before starting the new one.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: house-split
+  template:
+    metadata:
+      labels:
+        app: house-split
+    spec:
+      securityContext:
+        # the app runs as appuser (uid 1000, see the Dockerfile) and must be able to write to /data
+        fsGroup: 1000
+      containers:
+        - name: house-split
+          # the tag is set in kustomization.yaml
+          image: ghcr.io/tomasmbrito/house-split
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_PATH
+              value: /data/house.db
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: house-split-data

@@ -1,0 +1,11 @@
+# keeps the SQLite file when the pod is restarted or replaced
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: house-split-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
