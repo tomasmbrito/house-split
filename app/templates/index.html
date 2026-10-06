@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>House Split</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>House Split</h1>
+  <p class="subtitle">Who paid what, and who owes whom.</p>
+
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+  <section>
+    <h2>Who owes whom</h2>
+    {% if payments %}
+      <ul>
+        {% for p in payments %}
+          <li><b>{{ p.from }}</b> pays <b>{{ p.to }}</b> {{ p.amount | euros }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Nobody owes anything.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Housemates</h2>
+    <ul class="people">
+      {% for name in people %}
+        <li>{{ name }} <span class="{{ 'plus' if balances[name] >= 0 else 'minus' }}">{{ balances[name] | euros }}</span></li>
+      {% endfor %}
+    </ul>
+    <form method="post" action="{{ url_for('new_person') }}">
+      <input name="name" placeholder="Name" required>
+      <button>Add housemate</button>
+    </form>
+  </section>
+
+  {% if people %}
+  <section>
+    <h2>New expense</h2>
+    <form method="post" action="{{ url_for('new_expense') }}" class="expense-form">
+      <input name="description" placeholder="What was it? (e.g. groceries)" required>
+      <input name="amount" placeholder="Amount (€)" inputmode="decimal" required>
+      <label>Paid by
+        <select name="paid_by">
+          {% for name in people %}<option>{{ name }}</option>{% endfor %}
+        </select>
+      </label>
+      <fieldset>
+        <legend>Shared by (none ticked = everyone)</legend>
+        {% for name in people %}
+          <label><input type="checkbox" name="shared_by" value="{{ name }}"> {{ name }}</label>
+        {% endfor %}
+      </fieldset>
+      <button>Add expense</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <section>
+    <h2>Expenses</h2>
+    {% if expenses %}
+      <table>
+        <tr><th>What</th><th>Amount</th><th>Paid by</th><th>Shared by</th><th></th></tr>
+        {% for e in expenses %}
+          <tr>
+            <td>{{ e.description }}</td>
+            <td>{{ e.amount | euros }}</td>
+            <td>{{ e.paid_by }}</td>
+            <td>{{ e.shared_by | join(', ') }}</td>
+            <td>
+              <form method="post" action="{{ url_for('remove_expense', expense_id=e.id) }}">
+                <button class="link">delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No expenses yet.</p>
+    {% endif %}
+  </section>
+</body>
+</html>
