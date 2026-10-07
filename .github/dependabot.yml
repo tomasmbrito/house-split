@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # flask, gunicorn, pytest, ruff
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+
+  # python base image in the Dockerfile
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+
+  # actions used in ci.yml (also bumps the pinned Trivy commit)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # kind and helm providers in infra/
+  - package-ecosystem: terraform
+    directory: /infra
+    schedule:
+      interval: weekly
