@@ -7,4 +7,4 @@ resources:
 # on the deploy branch, CI replaces "latest" with the commit SHA of the image it just pushed
 images:
   - name: ghcr.io/tomasmbrito/house-split
-    newTag: latest
+    newTag: c348098aeb9b6c1c7eed9e491c0f95532ae28995
